@@ -1,0 +1,17 @@
+# Vanilla Autoencoder (AE) - MNIST
+model_type: ae
+
+# Model Architecture
+model_params:
+  input_dim: 784                    # 28*28 MNIST
+  hidden_dims: [512, 256, 128]      # Encoder/Decoder layers
+  latent_dim: 32                    # Bottleneck size
+
+# Training hyperparameters
+loss_type: reconstruction         # mse
+lr: 0.001
+epochs: 50
+
+# Data pipeline params
+batch_size: 128
+data_root: "data"

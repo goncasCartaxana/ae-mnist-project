@@ -1,0 +1,17 @@
+# Variational AutoEncoder (VAE) - MNIST
+model_type: vae
+
+# Model Architecture
+model_params:
+  input_dim: 784
+  hidden_dims: [512,256]
+  latent_dim: 32
+
+# Training hyperparameters
+loss_type: vae
+lr: 0.001
+epochs: 50
+
+# Data pipeline params
+batch_size: 128
+data_root: "data"

@@ -1,38 +1,64 @@
 import torch.nn as nn
 import torch
 
-from .vae_encoder import VAEEncoder  
+from .vae_encoder import VaeEncoder  
 from .decoder import Decoder
 
 
 
-class VAE(nn.Module):
+class Vae(nn.Module):
+    """
+    Variational Autoencoder (VAE) for MNIST generation.
+    
+    Architecture: Encoder → Reparameterization → Decoder
+    Input → latent space (μ, logσ²) → z ~ N(μ, σ) → Reconstruction
+    """
+    
     
     def __init__(self, input_dim, hidden_dims, latent_dim):
-        super(VAE, self).__init__()
+        """
+        Args:
+            input_dim (int): Flattened MNIST size (28×28 = 784)
+            hidden_dims (list): Encoder/decoder layer sizes (e.g. [512, 256, 128])
+            latent_dim (int): Latent space dimension (e.g. 20)
+        """
+        super(Vae, self).__init__()
         
-        # Defines encoder/decoder via config
-        self.encoder = VAEEncoder(input_dim, hidden_dims, latent_dim)
+        # Symmetric encoder/decoder via config
+        self.encoder = VaeEncoder(input_dim, hidden_dims, latent_dim)
         self.decoder = Decoder(latent_dim, list(reversed(hidden_dims)), input_dim)
     
     def reparameterization(self, mean, log_var):
         """
-        Reparameterization trick to sample from N(mean, std) from N(0,1).
-        z = μ + σ * ε    where ε ~ N(0,1)
+        Reparameterization trick: z = μ + σ * ε where ε ~ N(0,1)
+        
+        Args:
+            mean:    [batch_size, latent_dim]
+            log_var: [batch_size, latent_dim]
+        Returns:
+            z: Sampled latent vector [batch_size, latent_dim]
         """
-        std = torch.exp(0.5 * log_var)  # std = exp(0.5 * log_var)
-        eps = torch.randn_like(std)     # ε ~ N(0,1)
-        return mean + eps * std         # z = μ + σ * ε
+
+        std = torch.exp(0.5 * log_var)
+        eps = torch.randn_like(std)
+        return mean + eps * std 
     
     def forward(self, x):
-        # Encode → sample → decode
+        """
+        Full VAE forward pass for training.
+        
+        Args:
+            x: Input batch [batch_size, input_dim] (e.g. [128, 784])
+        Returns:
+            (x_hat, mean, log_var):
+                - x_hat:   Reconstruction [batch_size, input_dim]
+                - mean:    Latent mean [batch_size, latent_dim]
+                - log_var: Latent log-variance [batch_size, latent_dim]
+        """
+
         mean, log_var = self.encoder(x)
         z = self.reparameterization(mean, log_var)
         x_hat = self.decoder(z)
         
         return x_hat, mean, log_var
-
-
-
-
 

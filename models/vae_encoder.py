@@ -1,15 +1,29 @@
 import torch.nn as nn
 
-class VAEEncoder(nn.Module):
+class VaeEncoder(nn.Module): 
+    """
+    VAE Encoder: Maps input → latent space (μ, logσ²).
+    
+    Args:
+        input_dim: Flattened MNIST (28*28 = 784)
+        hidden_dims: List of hidden layer sizes (e.g. [512, 256, 128])
+        latent_dim: Output latent space dimension (e.g. 20)
+    
+    Returns: (mean, log_var) for reparameterization
+    """
     
     def __init__(self, input_dim, hidden_dims, latent_dim):
-        """ 
-        Defines the layers of the encoder network.
-        """ 
-        super(VAEEncoder, self).__init__()
+        """        
+        Args:
+            input_dim (int): Flattened input size (MNIST: 784)
+            hidden_dims (list): Hidden layer sizes (e.g. [512, 256, 128])
+            latent_dim (int): VAE latent space dimension (e.g. 20)
+        """
 
-        # list of hidden layers (from YAML!)
-        self.hidden_dims = hidden_dims # e.g. [512, 256, 128]
+        super(VaeEncoder, self).__init__()
+
+        # List of hidden layers
+        self.hidden_dims = hidden_dims
 
         # Build layers dynamically
         layers = []
@@ -29,13 +43,20 @@ class VAEEncoder(nn.Module):
 
     def forward(self, x):
         """
-        Defines the forward pass of the encoder network
-        Input:
-            x: input data points
-        Output: 
-            mean, log_var: latent space's mean and log variance vectors 
+        Forward pass: input → latent parameters.
+        
+        Args:
+            x: Input tensor [batch_size, input_dim] (e.g. [32, 784])
+            
+        Returns:
+            (mean, log_var): Latent space parameters 
+            - mean:    [batch_size, latent_dim] (e.g. [32, 20])
+            - log_var: [batch_size, latent_dim] (e.g. [32, 20])
+            
+        For reparameterization: z = mean + std * epsilon
         """
-        # start with input
+
+        # Start with input
         h = x
         # Process through each layer
         for layer in self.hidden_layers:

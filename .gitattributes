@@ -1,0 +1,6 @@
+# Force LF line endings everywhere (industry standard)
+* text=auto eol=lf
+
+# Binary files (no line ending conversion)
+*.pth binary
+*.pkl binary

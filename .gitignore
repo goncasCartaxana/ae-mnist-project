@@ -11,3 +11,6 @@ env/
 MNIST/
 *.pth
 
+# Experiments (large model outputs)
+experiments/*/results/
+!experiments/config_templates/

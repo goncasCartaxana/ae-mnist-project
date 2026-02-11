@@ -2,26 +2,26 @@
 The dataloader module creates data loaders for the MNIST dataset, allowing for configurable batch size and data directory.
 """
 
+from pathlib import Path
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 def get_mnist_loaders(config: dict):
     batch_size = config.get("batch_size", 128)
-    data_root = config.get("data_root", "./data")
+    data_root = Path(__file__).parent.parent / "data"
 
     transform = transforms.ToTensor()
 
-    # 
     train_dataset = datasets.MNIST(
         root=data_root,
         train=True,
-        download=True,
+        download=True, # Auto-downloads/caches MNIST (~11MB)
         transform=transform,
     )
     test_dataset = datasets.MNIST(
         root=data_root,
         train=False,
-        download=True,
+        download=True, # Auto-downloads/caches MNIST (~11MB)
         transform=transform,
     )
 

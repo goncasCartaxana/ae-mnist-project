@@ -39,12 +39,7 @@ def load_model_class(model_type: str):
     print(f"DEBUG: Loading {model_type} → {module_name}.{class_name}")
 
     module = importlib.import_module(module_name)
-    
-    if class_name not in all_names:
-         raise AttributeError(
-            f"Class '{class_name}' not found in models/{model_type}.py. "
-            f"Expected CamelCase class matching '{model_type}'."
-        )
+      
     return getattr(module, class_name)
 
 def main():
@@ -63,16 +58,12 @@ def main():
         config = yaml.safe_load(f)
     print(f"Config loaded: {config_path}")
 
-    # Load model dynamically (based on config)
-    print(f"  model_type = '{config['model_type']}'") # (e.g. 'vae')
+    # Load model dynamically
+    print(f"  model_type = '{config['model_type']}'")
     ModelClass = load_model_class(config["model_type"])
 
     print("Building model...")
-    model = ModelClass(
-        input_dim=config["input_dim"],
-        hidden_dims=config["hidden_dims"],
-        latent_dim=config["latent_dim"],
-    )
+    model = ModelClass(**config['model_params'])
 
     # Create dataloaders
     print("Loading MNIST...")
@@ -80,7 +71,7 @@ def main():
     
     # Train
     print("Starting training...")
-    trainer = Trainer(model, config)
+    trainer = Trainer(model, config = config)
     trainer.train(train_loader, test_loader)
     trainer.save_results(exp_dir)
 

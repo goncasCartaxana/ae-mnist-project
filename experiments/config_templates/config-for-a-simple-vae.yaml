@@ -1,4 +1,4 @@
-# Variational AutoEncoder (VAE) - MNIST
+# Model 
 model_type: vae
 
 # Model Architecture
@@ -14,4 +14,4 @@ epochs: 10
 
 # Data pipeline params
 batch_size: 128
-data_root: "data/"
+data_root: "data"

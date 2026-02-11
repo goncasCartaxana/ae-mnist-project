@@ -18,24 +18,22 @@ import torch.nn.functional as F
 
 
 class Trainer:
-    def __init__(self, model, config: dict):
+    
+    def __init__(self, model, config):
+        # 
         print("Starting trainer...")
         self.model = model
         self.config = config
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu') # Either: cuda(nvidia gpu), mps(apple), cpu
-        print(f"Device used: {self.device}")
         self.model.to(self.device)
+        print(f"Device used: {self.device}")
+
+        self.optimizer = torch.optim.Adam(model.parameters(), lr=config.get("lr", 1e-3))
+        self.loss_type = config.get("loss_type", "reconstruction")
+
         self.best_test_loss = float('inf') 
-
-        self.optimizer = torch.optim.Adam(
-            self.model.parameters(),
-            lr=config.get("lr", 1e-3) # default = 0.001
-        )
-
         self.train_losses = []
         self.test_losses = []
-
-        self.loss_type = config.get("loss_type", "reconstruction")  # e.g. "reconstruction" ou "vae" (reconstruction + KL)
 
     # ===== LOSSES =====
 
@@ -102,8 +100,6 @@ class Trainer:
         """Train model and save best_model.pth when validation improves."""
         epochs = self.config.get("epochs", 10)
 
-        self.best_test_loss = float('inf')
-
         for epoch in range(epochs):
             # Train + test
             train_loss = self.train_epoch(train_loader)
@@ -116,11 +112,11 @@ class Trainer:
             # Saves new model if best
             if test_loss < self.best_test_loss:
                 self.best_test_loss = test_loss
-                exp_dir = Path(self.config.get('exp_dir', 'results'))
+                exp_dir = Path('results')
 
                 # Create Directory if needed
                 results_dir = exp_dir / "results"
-                results_dir.mkdir(parents=True, exist_ok=True)
+                results_dir.mkdir(exist_ok=True)
                 # Save best model
                 torch.save({
                     'epoch': epoch + 1,

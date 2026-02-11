@@ -22,14 +22,14 @@ class Trainer:
         print("Starting trainer...")
         self.model = model
         self.config = config
-        self.device = torch.device(config.get("device", "cpu"))
-        print(f"device used: {self.device}")
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu') # Either: cuda(nvidia gpu), mps(apple), cpu
+        print(f"Device used: {self.device}")
         self.model.to(self.device)
         self.best_test_loss = float('inf') 
 
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
-            lr=config.get("lr", 1e-3) # default = 0.001 = 1e-3
+            lr=config.get("lr", 1e-3) # default = 0.001
         )
 
         self.train_losses = []
@@ -117,6 +117,11 @@ class Trainer:
             if test_loss < self.best_test_loss:
                 self.best_test_loss = test_loss
                 exp_dir = Path(self.config.get('exp_dir', 'results'))
+
+                # Create Directory if needed
+                results_dir = exp_dir / "results"
+                results_dir.mkdir(parents=True, exist_ok=True)
+                # Save best model
                 torch.save({
                     'epoch': epoch + 1,
                     'model_state_dict': self.model.state_dict(),
@@ -124,7 +129,7 @@ class Trainer:
                     'optimizer_state_dict': self.optimizer.state_dict(),
                     'train_loss': train_loss,
                     'test_loss': test_loss,
-                }, exp_dir / "results" / "best_model.pth")
+                }, results_dir / "best_model.pth")
                 print(f"Best improved: {test_loss:.4f} (epoch {epoch+1})")
 
             # Print progress
@@ -136,7 +141,7 @@ class Trainer:
             )
          
         # Final print
-        print(f"✅ Training concluded! Best loss: {self.best_test_loss:.4f}")
+        print(f"Training concluded! Best loss: {self.best_test_loss:.4f}")
 
 
     def save_results(self, exp_dir: Path):
@@ -145,19 +150,19 @@ class Trainer:
         results_dir.mkdir(exist_ok=True)
 
         print("\n" + "="*80)
-        print("💾 SALVING FINAL RESULTS!")
+        print("SALVING FINAL RESULTS!")
         print("="*80)
 
         # 1. Best model (saved during training)
         best_path = results_dir / "best_model.pth"
         if best_path.exists():
-            print(f"✅ BEST MODEL:  {best_path}")
+            print(f"BEST MODEL:  {best_path}")
         else:
-            print("⚠️  best_model.pth not found")
+            print("Best_model.pth not found")
         
-        # 2. Final model (last epoch)
+        # 2. Save final model (last epoch)
         torch.save(self.model.state_dict(), results_dir / "model.pth")
-        print(f"✅ FINAL MODEL: {results_dir / 'model.pth'}")
+        print(f"FINAL MODEL: {results_dir / 'model.pth'}")
 
         # 3. Full metrics (config + losses + final/best)
         metrics = {
@@ -171,7 +176,7 @@ class Trainer:
         }
         with open(results_dir / "metrics.json", "w") as f:
             json.dump(metrics, f, indent=2)
-        print(f"✅ METRICS:     {results_dir / 'metrics.json'}")
+        print(f"METRICS:     {results_dir / 'metrics.json'}")
 
          # 4. Per-epoch CSV
         df = pd.DataFrame({
@@ -180,15 +185,18 @@ class Trainer:
             "test_loss": self.test_losses,
         })
         df.to_csv(results_dir / "training_history.csv", index=False)
-        print(f"✅ CSV:         {results_dir / 'training_history.csv'}")
+        print(f"CSV:         {results_dir / 'training_history.csv'}")
 
 
         # Summary
-        print("\n📊 FINAL RESULTS:")
-        print(f"   🎯 Best test loss: {getattr(self, 'best_test_loss', 'N/A'):.4f}")
-        print(f"   📈 Train epochs:   {len(self.train_losses)}")
-        print(f"   📉 Test epochs:    {len(self.test_losses)}")
-        print(f"   ⏱️  Final losses:   train={self.train_losses[-1]:.4f if self.train_losses else 'N/A'}, "
-            f"test={self.test_losses[-1]:.4f if self.test_losses else 'N/A'}")
+        print("\nFINAL RESULTS:")
+        print(f"    Best test loss: {getattr(self, 'best_test_loss', 'N/A'):.4f}")
+        print(f"    Train epochs:   {len(self.train_losses)}")
+        print(f"    Test epochs:    {len(self.test_losses)}")
 
-        
+        if self.train_losses:
+            print(f"    Final train:   {self.train_losses[-1]:.4f}")
+        if self.test_losses:
+            print(f"    Final test:    {self.test_losses[-1]:.4f}")
+        print("=" * 80 + "\n")
+

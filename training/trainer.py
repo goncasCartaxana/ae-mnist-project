@@ -1,6 +1,6 @@
 """
 The Trainer class encapsulates the training loop for an AutoEncoder model.
-It handles the training and testing processes, and computes the VAE loss.
+It handles the training and testing processes, and computes the loss.
 
 Saves the results:
 - model.pth              # Model of last epoch
@@ -50,8 +50,9 @@ class Trainer:
     def compute_loss(self, x, model_output):
         """
         Accepts:
-        - input: "AE" -> output = x_hat
-        - input "VAE" -> model_output = (x_hat, mean, log_var)
+        - if loss_type = "reconstruction" -> output = x_hat
+        - if loss_type = "vae" -> model_output = (x_hat, mean, log_var)
+       
         """
 
         if self.loss_type == "reconstruction":

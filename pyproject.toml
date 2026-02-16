@@ -9,6 +9,7 @@ dependencies = [
   "pyyaml==6.0.2",
   "pandas",
   "tqdm",
+  "matplotlib>=3.10.8",
 ]
 
 [tool.uv.sources]

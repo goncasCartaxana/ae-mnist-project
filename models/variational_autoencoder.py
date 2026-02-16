@@ -6,7 +6,7 @@ from .decoder import Decoder
 
 
 
-class Vae(nn.Module):
+class VariationalAutoencoder(nn.Module):
     """
     Variational Autoencoder (VAE) for MNIST generation.
     
@@ -22,7 +22,7 @@ class Vae(nn.Module):
             hidden_dims (list): Encoder/decoder layer sizes (e.g. [512, 256, 128])
             latent_dim (int): Latent space dimension (e.g. 20)
         """
-        super(Vae, self).__init__()
+        super(VariationalAutoencoder, self).__init__()
         
         # Symmetric encoder/decoder via config
         self.encoder = VaeEncoder(input_dim, hidden_dims, latent_dim)

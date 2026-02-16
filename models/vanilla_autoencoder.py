@@ -5,7 +5,7 @@ from .ae_encoder import AeEncoder
 from .decoder import Decoder
 
 
-class Ae(nn.Module):
+class VanillaAutoencoder(nn.Module):
     """
     Vanilla Autoencoder (AE) for MNIST reconstruction.
     
@@ -20,7 +20,7 @@ class Ae(nn.Module):
             hidden_dims (list): Encoder/decoder layer sizes (e.g. [512, 256, 128])
             latent_dim (int): Bottleneck dimension (e.g. 32)
         """
-        super(Ae, self).__init__()
+        super(VanillaAutoencoder, self).__init__()
         
         # Symmetric encoder/decoder via config
         self.encoder = AeEncoder(input_dim, hidden_dims, latent_dim)

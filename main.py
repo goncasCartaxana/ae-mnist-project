@@ -22,10 +22,10 @@ def load_model_class(model_type: str):
     Dynamically loads model class from models/{model_type}.py.
     
     Args:
-        model_type (str): 'vae', 'aae', 'vanilla_ae' etc.
+        model_type (str): 'vanilla_autoencoder', 'variational_autoencoder', etc.
         
     Returns:
-        ModelClass: e.g. Vae, VanillaAe (nn.Module subclass) 
+        ModelClass: e.g. "VanillaAutoencoder" , "VariationalAutoencoder" (nn.Module subclass) 
         Convention: Which is the model_type in CamelCase.
         
     Raises:
@@ -33,8 +33,7 @@ def load_model_class(model_type: str):
     """
 
     module_name = f"models.{model_type}"
-    class_name = "".join(word.capitalize() for word in model_type.split("_"))
-    # Does CamelCase: vanilla_ae -> VanillaAe & variational_ae -> VariationalAe
+    class_name = "".join(word.capitalize() for word in model_type.split("_")) # Does CamelCase to go from <model>.py file name to <class> name
     
     print(f"DEBUG: Loading {model_type} → {module_name}.{class_name}")
 
@@ -44,10 +43,10 @@ def load_model_class(model_type: str):
 
 def main():
     """
-    Run complete VAE/AE experiment from config.yaml.
+    Run complete experiment from config.yaml.
     """
 
-    print("Starting AE MNIST experiment...")
+    print("Starting experiment...")
 
     # Load config.yaml
     exp_dir = Path.cwd()   # (e.g. experiments/exp001_vae_base)

@@ -1,5 +1,5 @@
 # Model 
-model_type: vae
+model_type: variational_autoencoder
 
 # Model Architecture
 model_params:

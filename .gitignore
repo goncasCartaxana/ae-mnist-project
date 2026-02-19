@@ -5,11 +5,20 @@ __pycache__/
 # Virtual environments
 venv/
 env/
+.venv/
 .env
 
 # Large datasets and model weights
 MNIST/
 *.pth
+*.pt
+
+
+# Generated outputs — reproducible from code, no need to track
+runs/**/model.*
+runs/**/reconstructions/
+experiments/**/results/
+experiments/**/model.*
 
 # Experiments (large model outputs)
 experiments/*/results/
